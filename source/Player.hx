@@ -1,17 +1,21 @@
 package;
 
+// import Sprite.MoveDirection;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 import flixel.sound.FlxSound;
+import flixel.util.FlxDirectionFlags;
 
-class Player extends FlxSprite
+class Player extends MapSprite
 {
-	static inline var SPEED:Float = 100;
+	#if mobile
+	var _virtualPad:FlxVirtualPad;
+	#end
 
 	var stepSound:FlxSound;
 
-	public function new(x:Float = 0, y:Float = 0)
+	public function new(x:Int = 0, y:Int = 0)
 	{
 		super(x, y);
 		loadGraphic(AssetPaths.bluelady__png, true, 16, 16);
@@ -26,101 +30,85 @@ class Player extends FlxSprite
 		animation.add("r_walk", [7, 6, 7, 8], 6);
 		animation.add("u_walk", [10, 9, 10, 11], 6);
 
-		drag.x = drag.y = 800;
-		setSize(8, 8);
-		offset.set(4, 8);
+		// drag.x = drag.y = 800;
+		// setSize(8, 8);
+		// offset.set(4, 8);
 
 		stepSound = FlxG.sound.load(AssetPaths.step__wav);
+
+		movementSpeed = 2;
+
+		#if mobile
+		_virtualPad = new FlxVirtualPad(FULL, NONE);
+		_virtualPad.alpha = 0.5;
+		FlxG.state.add(_virtualPad);
+		#end
 	}
 
 	override function update(elapsed:Float)
 	{
-		updateMovement();
 		super.update(elapsed);
-	}
-
-	function updateMovement()
-	{
-		var up:Bool = false;
-		var down:Bool = false;
-		var left:Bool = false;
-		var right:Bool = false;
-
-		#if FLX_KEYBOARD
-		up = FlxG.keys.anyPressed([UP, W]);
-		down = FlxG.keys.anyPressed([DOWN, S]);
-		left = FlxG.keys.anyPressed([LEFT, A]);
-		right = FlxG.keys.anyPressed([RIGHT, D]);
-		#end
 
 		#if mobile
-		var virtualPad = PlayState.virtualPad;
-		up = up || virtualPad.buttonUp.pressed;
-		down = down || virtualPad.buttonDown.pressed;
-		left = left || virtualPad.buttonLeft.pressed;
-		right = right || virtualPad.buttonRight.pressed;
+		if (_virtualPad.buttonDown.pressed)
+		{
+			moveTo(DOWN);
+		}
+		else if (_virtualPad.buttonUp.pressed)
+		{
+			moveTo(UP);
+		}
+		else if (_virtualPad.buttonLeft.pressed)
+		{
+			moveTo(LEFT);
+		}
+		else if (_virtualPad.buttonRight.pressed)
+		{
+			moveTo(RIGHT);
+		}
+		#else
+		// Check for WASD or arrow key presses and move accordingly
+		if (FlxG.keys.anyPressed([DOWN, S]))
+		{
+			moveTo(DOWN);
+			facing = DOWN;
+			animation.play("d_walk");
+		}
+		else if (FlxG.keys.anyPressed([UP, W]))
+		{
+			moveTo(UP);
+			facing = UP;
+			animation.play("u_walk");
+		}
+		else if (FlxG.keys.anyPressed([LEFT, A]))
+		{
+			moveTo(LEFT);
+			facing = LEFT;
+			animation.play("l_walk");
+		}
+		else if (FlxG.keys.anyPressed([RIGHT, D]))
+		{
+			moveTo(RIGHT);
+			facing = RIGHT;
+			animation.play("r_walk");
+		}
 		#end
 
-		if (up && down)
-			up = down = false;
-		if (left && right)
-			left = right = false;
-
-		if (up || down || left || right)
+		if (!moveToNextTile)
 		{
-			var newAngle:Float = 0;
-			if (up)
+			switch (facing)
 			{
-				newAngle = -90;
-				if (left)
-					newAngle -= 45;
-				else if (right)
-					newAngle += 45;
-				facing = UP;
+				case LEFT:
+					animation.play("l_idle");
+				case RIGHT:
+					animation.play("r_idle");
+				case UP:
+					animation.play("u_idle");
+				case DOWN:
+					animation.play("d_idle");
+				case _:
 			}
-			else if (down)
-			{
-				newAngle = 90;
-				if (left)
-					newAngle += 45;
-				else if (right)
-					newAngle -= 45;
-				facing = DOWN;
-			}
-			else if (left)
-			{
-				newAngle = 180;
-				facing = LEFT;
-			}
-			else if (right)
-			{
-				newAngle = 0;
-				facing = RIGHT;
-			}
-
-			// determine our velocity based on angle and speed
-			velocity.setPolarDegrees(SPEED, newAngle);
 		}
-
-		var action = "idle";
-		// check if the player is moving, and not walking into walls
-		if ((velocity.x != 0 || velocity.y != 0) && touching == NONE)
-		{
-			stepSound.play();
-			action = "walk";
-		}
-
-		switch (facing)
-		{
-			case LEFT:
-				animation.play("l_" + action);
-			case RIGHT:
-				animation.play("r_" + action);
-			case UP:
-				animation.play("u_" + action);
-			case DOWN:
-				animation.play("d_" + action);
-			case _:
-		}
+		// checkInteractions();
 	}
 }
