@@ -11,6 +11,7 @@ class PlayState extends FlxState
 	var mapX:Int;
 	var mapY:Int;
 	var distance:Int;
+	var occupation:Array<Array<Bool>> = [for (x in 0...30) [for (y in 0...30) false]];
 
 	override public function create()
 	{
@@ -28,6 +29,7 @@ class PlayState extends FlxState
 		super.update(elapsed);
 		// FlxG.collide(player, npcs);
 		checkInteractions();
+		checkOccupation();
 	}
 
 	function checkInteractions()
@@ -43,6 +45,25 @@ class PlayState extends FlxState
 					trace("talking!");
 				}
 			}
+		}
+	}
+
+	// not working lol
+	function checkOccupation()
+	{
+		occupation[player.mapX][player.mapY] = true;
+		for (n in npcs)
+		{
+			occupation[n.mapX][n.mapY] = true;
+		}
+		for (n in npcs)
+		{
+			if (occupation[n.nextMapX][n.nextMapY])
+				n.moveDirection = NONE;
+		}
+		if (occupation[player.nextMapX][player.nextMapY])
+		{
+			player.moveDirection = NONE;
 		}
 	}
 

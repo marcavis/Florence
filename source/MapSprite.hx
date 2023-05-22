@@ -28,7 +28,7 @@ class MapSprite extends FlxSprite
 	/**
 	 * Var used to hold moving direction.
 	 */
-	var moveDirection:FlxDirectionFlags;
+	public var moveDirection:FlxDirectionFlags;
 
 	public var mapX:Int;
 	public var mapY:Int;
@@ -91,6 +91,17 @@ class MapSprite extends FlxSprite
 				case RIGHT:
 					nextMapX++;
 				case _:
+			}
+
+			if (nextMapY < 0)
+			{
+				nextMapY = 0;
+				moveDirection = NONE;
+			}
+			if (nextMapX < 0)
+			{
+				nextMapX = 0;
+				moveDirection = NONE;
 			}
 		}
 	}
