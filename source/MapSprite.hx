@@ -4,7 +4,6 @@
 
 import flixel.FlxSprite;
 import flixel.util.FlxDirectionFlags;
-import haxe.macro.Compiler.IncludePosition;
 
 class MapSprite extends FlxSprite
 {
@@ -35,11 +34,14 @@ class MapSprite extends FlxSprite
 	public var nextMapX:Int;
 	public var nextMapY:Int;
 
-	override public function new(x:Int = 0, y:Int = 0)
+	var playState:PlayState;
+
+	override public function new(x:Int = 0, y:Int = 0, playState:PlayState)
 	{
 		super(x, y);
 		nextMapX = Std.int(x / TILE_SIZE);
 		nextMapY = Std.int(y / TILE_SIZE);
+		this.playState = playState;
 	}
 
 	override function update(elapsed:Float)
@@ -69,17 +71,17 @@ class MapSprite extends FlxSprite
 			mapX = Std.int(x / TILE_SIZE);
 			mapY = Std.int(y / TILE_SIZE);
 		}
-		if (movementSpeed == 2)
-			trace(mapX, mapY, nextMapX, nextMapY);
+		// if (movementSpeed == 2)
+		//	trace(mapX, mapY, nextMapX, nextMapY);
 	}
 
-	public function moveTo(Direction:FlxDirectionFlags):Void
+	public function moveTo(Direction:FlxDirectionFlags, x:Int, y:Int):Void
 	{
 		// Only change direction if not already moving
 		if (!moveToNextTile)
 		{
 			moveDirection = Direction;
-			moveToNextTile = true;
+
 			switch (moveDirection)
 			{
 				case UP:
@@ -92,17 +94,21 @@ class MapSprite extends FlxSprite
 					nextMapX++;
 				case _:
 			}
+			if (playState.canMove(x, y))
+			{
+				moveToNextTile = true;
+			}
 
-			if (nextMapY < 0)
-			{
-				nextMapY = 0;
-				moveDirection = NONE;
-			}
-			if (nextMapX < 0)
-			{
-				nextMapX = 0;
-				moveDirection = NONE;
-			}
+			// if (nextMapY < 0)
+			// {
+			// 	nextMapY = 0;
+			// 	moveDirection = NONE;
+			// }
+			// if (nextMapX < 0)
+			// {
+			// 	nextMapX = 0;
+			// 	moveDirection = NONE;
+			// }
 		}
 	}
 }

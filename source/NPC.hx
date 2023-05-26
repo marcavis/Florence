@@ -15,9 +15,9 @@ class NPC extends MapSprite
 	var idleTimer:Float = 0;
 	var randomDirection:FlxDirectionFlags;
 
-	public function new(x:Int = 0, y:Int = 0)
+	public function new(x:Int = 0, y:Int = 0, playState:PlayState)
 	{
-		super(x, y);
+		super(x, y, playState);
 		loadGraphic(AssetPaths.greenslime__png, true, 16, 16);
 		setFacingFlip(LEFT, false, false);
 		setFacingFlip(RIGHT, false, false);
@@ -33,6 +33,8 @@ class NPC extends MapSprite
 		stepSound = FlxG.sound.load(AssetPaths.step__wav);
 
 		movementSpeed = 1;
+
+		immovable = true;
 	}
 
 	override function update(elapsed:Float)
@@ -44,18 +46,22 @@ class NPC extends MapSprite
 		if (FlxG.random.bool(desireToMove) && idleTimer <= 0)
 		{
 			randomDirection = FlxG.random.getObject([DOWN, UP, LEFT, RIGHT]);
-			moveTo(randomDirection);
+
 			facing = randomDirection;
 			idleTimer = FlxG.random.int(1, 2);
 			switch (randomDirection)
 			{
 				case LEFT:
+					moveTo(LEFT, mapX - 1, mapY);
 					animation.play("l_walk");
 				case RIGHT:
+					moveTo(RIGHT, mapX + 1, mapY);
 					animation.play("r_walk");
 				case UP:
+					moveTo(UP, mapX, mapY - 1);
 					animation.play("u_walk");
 				case DOWN:
+					moveTo(DOWN, mapX, mapY + 1);
 					animation.play("d_walk");
 				case _:
 			}

@@ -15,9 +15,9 @@ class Player extends MapSprite
 
 	var stepSound:FlxSound;
 
-	public function new(x:Int = 0, y:Int = 0)
+	public function new(x:Int = 0, y:Int = 0, playState:PlayState)
 	{
-		super(x, y);
+		super(x, y, playState);
 		loadGraphic(AssetPaths.bluelady__png, true, 16, 16);
 		setFacingFlip(LEFT, false, false);
 		setFacingFlip(RIGHT, false, false);
@@ -37,6 +37,7 @@ class Player extends MapSprite
 		stepSound = FlxG.sound.load(AssetPaths.step__wav);
 
 		movementSpeed = 2;
+		elasticity = 1;
 
 		#if mobile
 		_virtualPad = new FlxVirtualPad(FULL, NONE);
@@ -70,25 +71,25 @@ class Player extends MapSprite
 		// Check for WASD or arrow key presses and move accordingly
 		if (FlxG.keys.anyPressed([DOWN, S]))
 		{
-			moveTo(DOWN);
+			moveTo(DOWN, mapX, mapY + 1);
 			facing = DOWN;
 			animation.play("d_walk");
 		}
 		else if (FlxG.keys.anyPressed([UP, W]))
 		{
-			moveTo(UP);
+			moveTo(UP, mapX, mapY - 1);
 			facing = UP;
 			animation.play("u_walk");
 		}
 		else if (FlxG.keys.anyPressed([LEFT, A]))
 		{
-			moveTo(LEFT);
+			moveTo(LEFT, mapX - 1, mapY);
 			facing = LEFT;
 			animation.play("l_walk");
 		}
 		else if (FlxG.keys.anyPressed([RIGHT, D]))
 		{
-			moveTo(RIGHT);
+			moveTo(RIGHT, mapX + 1, mapY);
 			facing = RIGHT;
 			animation.play("r_walk");
 		}

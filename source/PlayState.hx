@@ -1,8 +1,13 @@
 package;
 
 import flixel.FlxG;
+import flixel.FlxObject;
+import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.group.FlxGroup;
+import flixel.tile.FlxTilemap;
 
 class PlayState extends FlxState
 {
@@ -12,13 +17,28 @@ class PlayState extends FlxState
 	var mapY:Int;
 	var distance:Int;
 	var occupation:Array<Array<Bool>> = [for (x in 0...30) [for (y in 0...30) false]];
+	var map:FlxOgmo3Loader;
+	var walls:FlxTilemap;
+	var solidAreas:FlxGroup;
 
 	override public function create()
 	{
-		player = new Player(48, 48);
+		map = new FlxOgmo3Loader(AssetPaths.florence__ogmo, AssetPaths.test1__json);
+		walls = map.loadTilemap(AssetPaths.tiles__png, "ground");
+		walls.follow();
+		walls.setTileProperties(1, NONE);
+		walls.setTileProperties(2, ANY);
+		add(walls);
+
+		// for (tile in walls.getTile)
+		// {
+		// 	trace(tile);
+		// }
+
+		player = new Player(48, 48, this);
 		add(player);
 		npcs = new FlxTypedGroup<NPC>();
-		npcs.add(new NPC(128, 128));
+		npcs.add(new NPC(144, 128, this));
 
 		add(npcs);
 		super.create();
@@ -27,9 +47,54 @@ class PlayState extends FlxState
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		// FlxG.collide(player, npcs);
+		// FlxG.overlap(player, npcs, npcBump);
+		// FlxG.collide(player, walls, bumpAway);
+		// FlxG.collide(npcs, walls, wat);
 		checkInteractions();
-		checkOccupation();
+		// checkOccupation();
+		// if (collideWithLevel(player))
+		// {
+		// 	player.moveToNextTile = false;
+		// }
+	}
+
+	public function collideWithLevel(obj:MapSprite):Bool
+	{
+		if (walls.overlapsWithCallback(obj, bumpAway(obj, walls)))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public function npcBump(pc:MapSprite, npc:MapSprite)
+	{
+		trace(pc.x, pc.y, npc.x, npc.y);
+		npc.x = npc.mapX * 16;
+		npc.y = npc.mapY * 16;
+		npc.moveDirection = NONE;
+		pc.x = pc.mapX * 16;
+		pc.y = pc.mapY * 16;
+		// FlxObject.separate(pc, npc);
+	}
+
+	public function bumpAway(pc:MapSprite, map:FlxObject):Bool
+	{
+		pc.x = pc.mapX * 16;
+		pc.y = pc.mapY * 16;
+		// FlxObject.separate(pc, map);
+		trace(pc.x, pc.y, pc.mapX, pc.mapY);
+		return true;
+	}
+
+	public function wat(npc:MapSprite, map:FlxObject)
+	{
+		trace(npc);
+	}
+
+	public function canMove(x:Int, y:Int)
+	{
+		return walls.getTile(x, y) == 1;
 	}
 
 	function checkInteractions()
