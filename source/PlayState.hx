@@ -92,9 +92,31 @@ class PlayState extends FlxState
 		trace(npc);
 	}
 
-	public function canMove(x:Int, y:Int)
+	public function canMove(obj:MapSprite, x:Int, y:Int)
 	{
-		return walls.getTile(x, y) == 1;
+		var mapWalkable:Bool = walls.getTile(x, y) == 1;
+		var nobodyHere:Bool = true;
+		// if (Std.is(obj, Player))
+		// {
+
+		// }
+		for (n in npcs)
+		{
+			if (n != obj)
+			{
+				if (n.mapX == x && n.mapY == y)
+					return false;
+				if (n.nextMapX == x && n.nextMapY == y)
+					return false;
+			}
+		}
+		if (Std.isOfType(obj, NPC))
+		{
+			nobodyHere = x != player.mapX || y != player.mapY;
+			nobodyHere = nobodyHere && (x != player.nextMapX || y != player.nextMapY);
+		}
+		// trace(obj, mapWalkable, nobodyHere);
+		return mapWalkable && nobodyHere;
 	}
 
 	function checkInteractions()

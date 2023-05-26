@@ -49,7 +49,7 @@ class Player extends MapSprite
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-
+		var tryingToMove:Bool = false;
 		#if mobile
 		if (_virtualPad.buttonDown.pressed)
 		{
@@ -71,31 +71,35 @@ class Player extends MapSprite
 		// Check for WASD or arrow key presses and move accordingly
 		if (FlxG.keys.anyPressed([DOWN, S]))
 		{
+			tryingToMove = true;
 			moveTo(DOWN, mapX, mapY + 1);
 			facing = DOWN;
 			animation.play("d_walk");
 		}
 		else if (FlxG.keys.anyPressed([UP, W]))
 		{
+			tryingToMove = true;
 			moveTo(UP, mapX, mapY - 1);
 			facing = UP;
 			animation.play("u_walk");
 		}
 		else if (FlxG.keys.anyPressed([LEFT, A]))
 		{
+			tryingToMove = true;
 			moveTo(LEFT, mapX - 1, mapY);
 			facing = LEFT;
 			animation.play("l_walk");
 		}
 		else if (FlxG.keys.anyPressed([RIGHT, D]))
 		{
+			tryingToMove = true;
 			moveTo(RIGHT, mapX + 1, mapY);
 			facing = RIGHT;
 			animation.play("r_walk");
 		}
 		#end
 
-		if (!moveToNextTile)
+		if (!moveToNextTile && !tryingToMove)
 		{
 			switch (facing)
 			{
@@ -110,6 +114,20 @@ class Player extends MapSprite
 				case _:
 			}
 		}
-		// checkInteractions();
+	}
+
+	public function moveTo(Direction:FlxDirectionFlags, newX:Int, newY:Int):Void
+	{
+		// Only change direction if not already moving
+		if (!moveToNextTile)
+		{
+			moveDirection = Direction;
+			nextMapX = newX;
+			nextMapY = newY;
+			if (playState.canMove(this, newX, newY))
+			{
+				moveToNextTile = true;
+			}
+		}
 	}
 }

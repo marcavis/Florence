@@ -83,4 +83,20 @@ class NPC extends MapSprite
 			}
 		}
 	}
+
+	public function moveTo(Direction:FlxDirectionFlags, newX:Int, newY:Int):Void
+	{
+		// Only change direction if not already moving
+		if (!moveToNextTile)
+		{
+			moveDirection = Direction;
+
+			if (playState.canMove(this, newX, newY))
+			{
+				nextMapX = newX;
+				nextMapY = newY;
+				moveToNextTile = true;
+			}
+		}
+	}
 }

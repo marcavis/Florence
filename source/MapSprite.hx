@@ -74,41 +74,4 @@ class MapSprite extends FlxSprite
 		// if (movementSpeed == 2)
 		//	trace(mapX, mapY, nextMapX, nextMapY);
 	}
-
-	public function moveTo(Direction:FlxDirectionFlags, x:Int, y:Int):Void
-	{
-		// Only change direction if not already moving
-		if (!moveToNextTile)
-		{
-			moveDirection = Direction;
-
-			switch (moveDirection)
-			{
-				case UP:
-					nextMapY--;
-				case DOWN:
-					nextMapY++;
-				case LEFT:
-					nextMapX--;
-				case RIGHT:
-					nextMapX++;
-				case _:
-			}
-			if (playState.canMove(x, y))
-			{
-				moveToNextTile = true;
-			}
-
-			// if (nextMapY < 0)
-			// {
-			// 	nextMapY = 0;
-			// 	moveDirection = NONE;
-			// }
-			// if (nextMapX < 0)
-			// {
-			// 	nextMapX = 0;
-			// 	moveDirection = NONE;
-			// }
-		}
-	}
 }
