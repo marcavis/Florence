@@ -18,21 +18,22 @@ class Player extends MapSprite
 	public function new(x:Int = 0, y:Int = 0, playState:PlayState)
 	{
 		super(x, y, playState);
-		loadGraphic(AssetPaths.bluelady__png, true, 16, 16);
+		loadGraphic(AssetPaths.karin__png, true, 32, 40);
 		setFacingFlip(LEFT, false, false);
 		setFacingFlip(RIGHT, false, false);
-		animation.add("d_idle", [1]);
+		animation.add("d_idle", [0]);
 		animation.add("l_idle", [4]);
-		animation.add("r_idle", [7]);
-		animation.add("u_idle", [10]);
-		animation.add("d_walk", [1, 0, 1, 2], 6);
-		animation.add("l_walk", [4, 3, 4, 5], 6);
-		animation.add("r_walk", [7, 6, 7, 8], 6);
-		animation.add("u_walk", [10, 9, 10, 11], 6);
+		animation.add("r_idle", [8]);
+		animation.add("u_idle", [12]);
+		animation.add("d_walk", [0, 2, 1, 3], 4);
+		animation.add("l_walk", [4, 6, 5, 7], 4);
+		animation.add("r_walk", [8, 10, 9, 11], 4);
+		animation.add("u_walk", [12, 14, 13, 15], 4);
 
 		// drag.x = drag.y = 800;
 		// setSize(8, 8);
 		// offset.set(4, 8);
+		offset.set(8, 24);
 
 		stepSound = FlxG.sound.load(AssetPaths.step__wav);
 
@@ -74,6 +75,7 @@ class Player extends MapSprite
 			tryingToMove = true;
 			moveTo(DOWN, mapX, mapY + 1);
 			facing = DOWN;
+			trace(animation.name, animation.frameIndex);
 			animation.play("d_walk");
 		}
 		else if (FlxG.keys.anyPressed([UP, W]))
